@@ -7,7 +7,7 @@ from mediapipe.tasks.python.vision import drawing_styles
 import cv2
 import numpy as np
 
-model_path = r'C:\Users\Vitik\Documents\GitHub\CS131-EDGE-Project\face_landmarker.task'
+model_path = r'face_landmarker.task'
 
 BaseOptions = mp.tasks.BaseOptions
 FaceLandmarker = mp.tasks.vision.FaceLandmarker
