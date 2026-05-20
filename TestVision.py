@@ -1,3 +1,4 @@
+import paho.mqtt.client as mqtt
 import time
 import mediapipe as mp
 from mediapipe.tasks import python
@@ -6,6 +7,30 @@ from mediapipe.tasks.python.vision import drawing_utils
 from mediapipe.tasks.python.vision import drawing_styles
 import cv2
 import numpy as np
+
+BrokerIP = "IP HERE"
+
+state = {"accel_alert": False, "vision_alert": False} 
+
+def trigger_alert():
+    print("Both eyes closed and irratic driving detected.")
+
+def on_message(client, userdata, msg):
+    payload = msg.payload.decode()
+    print(f"On Message Fires - Topic: {msg.topic}, Payload: {payload}")
+    
+    if msg.topic == "driver/accel":
+        state["accel_alert"] = payload == "ALERT"
+
+def on_connect(client, userdata, flags, reason_code, properties):
+    print(f"Connected to broker: {reason_code}")
+    client.subscribe("driver/accel") 
+
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+client.on_connect = on_connect 
+client.on_message = on_message
+client.connect(BrokerIP, 1883)
+client.loop_start()
 
 model_path = r'face_landmarker.task'
 
@@ -35,7 +60,13 @@ def process_result(result: FaceLandmarkerResult, output_image: mp.Image, timesta
             right_eye_closed = right_blink_score > 0.5
             
             print(f"Left Eye Closed: {left_eye_closed} ({left_blink_score:.2f}), Right Eye Closed: {right_eye_closed} ({right_blink_score:.2f})")
-    
+            
+            state["vision_alert"] = left_eye_closed and right_eye_closed
+            payload = "ALERT" if left_eye_closed and right_eye_closed else "CLEAR"
+            client.publish("driver/vision", payload)
+
+            if state["accel_alert"] and state["vision_alert"]:
+                trigger_alert()
 
     for face_landmarks in result.face_landmarks:
 
@@ -107,3 +138,4 @@ with FaceLandmarker.create_from_options(options) as landmarker:
 
     vidLive.release()
     cv2.destroyAllWindows()
+    client.disconnect()

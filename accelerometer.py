@@ -1,6 +1,13 @@
+import paho.mqtt.client as mqtt
 import time
 from collections import deque
 from smbus2 import SMBus
+
+BrokerIP = "IP HERE"
+
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+client.connect(BrokerIP, 1883)
+client.loop_start()
 
 MPU_ADDR = 0x68
 PWR_MGMT_1 = 0x6B
@@ -30,6 +37,8 @@ def main():
             x, y, z = read_accel(bus)
             window.append(abs(y))                       # lateral axis
             erratic = sum(v > THRESHOLD_G for v in window) >= N_REQUIRED
+            payload = "ALERT" if erratic else "CLEAR"
+            client.publish("driver/accel", payload)
             print(f"x={x:+.2f} y={y:+.2f} z={z:+.2f}  erratic={erratic}")
             time.sleep(0.1)
 
