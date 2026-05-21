@@ -7,13 +7,28 @@ from mediapipe.tasks.python.vision import drawing_utils
 from mediapipe.tasks.python.vision import drawing_styles
 import cv2
 import numpy as np
+import firebase_admin
+from firebase_admin import credentials, firestore
+import datetime
 
+cred = credentials.Certificate("/pathtokey/.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+last_alert_time = 0
+alert_start_time = None
+
+def send_alert_msg(duration):    
+    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    db.collection("alerts").add({"message": "Unsafe Driving Detected", "time": current_time, "duration": duration})
+    print("Alert sent to cloud.")
+    
 BrokerIP = "IP HERE"
 
 state = {"accel_alert": False, "vision_alert": False} 
 
-def trigger_alert():
-    print("Both eyes closed and irratic driving detected.")
+def trigger_alert(duration):
+    print(f"Both eyes closed and erratic driving detected for: {duration:1.f}s.")
 
 def on_message(client, userdata, msg):
     payload = msg.payload.decode()
@@ -44,6 +59,7 @@ annotated_frame = None
 
 def process_result(result: FaceLandmarkerResult, output_image: mp.Image, timestamp_ms: int):
     global annotated_frame
+    global alert_start_time, last_alert_time
     
     annotated_image = np.copy(output_image.numpy_view())
     
@@ -66,7 +82,22 @@ def process_result(result: FaceLandmarkerResult, output_image: mp.Image, timesta
             client.publish("driver/vision", payload)
 
             if state["accel_alert"] and state["vision_alert"]:
-                trigger_alert()
+                now = time.time()
+    
+                if alert_start_time is None:
+                    alert_start_time = now
+                    
+                duration = now - alert_start_time
+                trigger_alert(duration)
+                
+                last_cloud_msg = now - last_alert_time 
+                
+                # Alert sends to cloud once every 10 seconds, and when duration is past 3 seconds
+                if last_cloud_msg >= 10 and duration >= 3:
+                    last_alert_time = now
+                    send_alert_msg(duration)
+            else:
+                alert_start_time = None
 
     for face_landmarks in result.face_landmarks:
 
