@@ -10,13 +10,13 @@ import {
 } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "fillhere",
-  authDomain: "fillhere",
-  projectId: "fillhere",
-  storageBucket: "fillhere",
-  messagingSenderId: "fillhere",
-  appId: "fillhere",
-  measurementId: "fillhere",
+  apiKey: "AIzaSyC3BEOPR2cA_8Bx5mZ4dCwRYoDd3R-dAFI",
+  authDomain: "cs131-89a4c.firebaseapp.com",
+  projectId: "cs131-89a4c",
+  storageBucket: "cs131-89a4c.firebasestorage.app",
+  messagingSenderId: "737239388234",
+  appId: "1:737239388234:web:4984c3fba4c8d1ea3016b3",
+  measurementId: "G-W2EDJTX2D8"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -59,7 +59,7 @@ export default function HomePage() {
       <div className="my-[2vh]">
         <p className="text-2xl">Logs</p>
       </div>
-      <div className="my-[2vh] h-[50vh] w-auto overflow-scroll">
+      <div className="my-[2vh] h-[60vh] w-[75vw] overflow-scroll border-2 border-[#9ca3af] pt-4">
         {alerts.map((alert) => (
           <div key={alert.id} className="grid grid-cols-3 w-full gap-[4vw]">
             <p className="text-xl">
@@ -71,12 +71,14 @@ export default function HomePage() {
           </div>
         ))}
       </div>
+      <div className="my-[2vh]">
       <button
         onClick={clearLogs}
         className="rounded-2xl bg-red-900 w-25 h-10 hover:bg-gray-500 cursor-pointer"
       >
         Reset Logs
       </button>
+      </div>
     </div>
   );
 }
