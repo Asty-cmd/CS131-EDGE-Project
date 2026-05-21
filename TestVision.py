@@ -20,7 +20,7 @@ alert_start_time = None
 
 def send_alert_msg(duration):    
     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    db.collection("alerts").add({"message": "Unsafe Driving Detected", "time": current_time, "duration": f"{duration:.1f}s"})
+    db.collection("alerts").add({"message": "Unsafe Driving Detected", "time": current_time, "duration": round(duration, 2)})
     print("Alert sent to cloud.")
     
 BrokerIP = "IP HERE"
@@ -28,7 +28,7 @@ BrokerIP = "IP HERE"
 state = {"accel_alert": False, "vision_alert": False} 
 
 def trigger_alert(duration):
-    print(f"Both eyes closed and erratic driving detected for: {duration:.1f}s.")
+    print(f"Both eyes closed and erratic driving detected for: {round(duration,2)}s.")
 
 def on_message(client, userdata, msg):
     payload = msg.payload.decode()
