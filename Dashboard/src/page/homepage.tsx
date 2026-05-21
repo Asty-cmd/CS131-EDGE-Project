@@ -59,7 +59,7 @@ export default function HomePage() {
       <div className="my-[2vh]">
         <p className="text-2xl">Logs</p>
       </div>
-      <div className="my-[2vh] h-[50vh] w-auto overflow-scroll">
+      <div className="my-[2vh] h-[60vh] w-[75vw] overflow-scroll border-2 border-[#9ca3af] pt-4">
         {alerts.map((alert) => (
           <div key={alert.id} className="grid grid-cols-3 w-full gap-[4vw]">
             <p className="text-xl">
@@ -71,12 +71,14 @@ export default function HomePage() {
           </div>
         ))}
       </div>
+      <div className="my-[2vh]">
       <button
         onClick={clearLogs}
         className="rounded-2xl bg-red-900 w-25 h-10 hover:bg-gray-500 cursor-pointer"
       >
         Reset Logs
       </button>
+      </div>
     </div>
   );
 }
