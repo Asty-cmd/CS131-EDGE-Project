@@ -22,7 +22,6 @@ https://github.com/google-ai-edge/mediapipe-samples/tree/main/examples/face_land
   - Create VENV: python3 -m venv paho-mqtt
   - Activate VENV: source paho-mqtt/bin/activate
   - Install paho-mqtt: pip install paho-mqtt
-
 ### Edge Device 1 (Subscriber/Broker/Vision)
 - Install Mosquitto
   - sudo apt update && sudo apt install mosquitto mosquitto-clients
@@ -31,13 +30,13 @@ https://github.com/google-ai-edge/mediapipe-samples/tree/main/examples/face_land
   - sudo systemctl restart mosquitto
   - sudo systemctl enable mosquitto
   - sudo systemctl status mosquitto
-- Get IP and update "BrokerIP" variable in both TestVision.Py and accelerometer.Py
+- Get IP and update "BrokerIP" variable in both TestVision.py and accelerometer.py
   - hostname -I
-- Run computer vision: python3 TestVision.Py
-
+- Run computer vision: python3 TestVision.py
 ### Edge Device 2 (Publisher/Accelerometer)
-- Run accelerometer: python3 accelerometer.Py
-
+- Run accelerometer: python3 accelerometer.py
 ### Mosquitto cmds:
 - Display connection and port status: netstat -an | grep 1883
 - View broker logs: sudo journalctl -u mosquitto -f
+### Firebase Install:
+- pip install firebase-admin
