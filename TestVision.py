@@ -10,6 +10,8 @@ import numpy as np
 import firebase_admin
 from firebase_admin import credentials, firestore
 import datetime
+from playsound import playsound
+import threading
 
 cred = credentials.Certificate("/pathtokey/.json")
 firebase_admin.initialize_app(cred)
@@ -17,6 +19,8 @@ db = firestore.client()
 
 last_alert_time = 0
 alert_start_time = None
+
+alert_playing = False
 
 def send_alert_msg(duration):    
     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -27,8 +31,19 @@ BrokerIP = "IP HERE"
 
 state = {"accel_alert": False, "vision_alert": False} 
 
+def trigger_alert_sound():
+    global alert_playing
+    playsound('AlertSound.wav')
+    alert_playing = False
+    
 def trigger_alert(duration):
     print(f"Both eyes closed and erratic driving detected for: {round(duration,2)}s.")
+    global alert_playing
+    if not alert_playing:
+        alert_playing = True
+        thread = threading.Thread(target=trigger_alert_sound)
+        thread.daemon = True
+        thread.start()
 
 def on_message(client, userdata, msg):
     payload = msg.payload.decode()
