@@ -7,13 +7,28 @@ from mediapipe.tasks.python.vision import drawing_utils
 from mediapipe.tasks.python.vision import drawing_styles
 import cv2
 import numpy as np
+from playsound import playsound
+import threading
 
 BrokerIP = "IP HERE"
 
 state = {"accel_alert": False, "vision_alert": False} 
 
+alert_playing = False
+
 def trigger_alert():
     print("Both eyes closed and irratic driving detected.")
+    global alert_playing
+    if not alert_playing:
+        alert_playing = True
+        thread = threading.Thread(target=trigger_alert_sound)
+        thread.daemon = True
+        thread.start()
+
+def trigger_alert_sound():
+    global alert_playing
+    playsound('AlertSound.wav')
+    alert_playing = False
 
 def on_message(client, userdata, msg):
     payload = msg.payload.decode()
