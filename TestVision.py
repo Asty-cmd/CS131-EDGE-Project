@@ -38,13 +38,7 @@ def trigger_alert_sound():
     
 def trigger_alert(duration):
     print(f"Both eyes closed and erratic driving detected for: {round(duration,2)}s.")
-    global alert_playing
-    if not alert_playing:
-        alert_playing = True
-        thread = threading.Thread(target=trigger_alert_sound)
-        thread.daemon = True
-        thread.start()
-
+    
 def on_message(client, userdata, msg):
     payload = msg.payload.decode()
     print(f"On Message Fires - Topic: {msg.topic}, Payload: {payload}")
@@ -75,7 +69,7 @@ annotated_frame = None
 def process_result(result: FaceLandmarkerResult, output_image: mp.Image, timestamp_ms: int):
     global annotated_frame
     global alert_start_time, last_alert_time
-    
+    global alert_playing 
     annotated_image = np.copy(output_image.numpy_view())
     
 
@@ -98,7 +92,7 @@ def process_result(result: FaceLandmarkerResult, output_image: mp.Image, timesta
 
             if state["accel_alert"] and state["vision_alert"]:
                 now = time.time()
-    
+
                 if alert_start_time is None:
                     alert_start_time = now
                     
@@ -107,10 +101,17 @@ def process_result(result: FaceLandmarkerResult, output_image: mp.Image, timesta
                 
                 last_cloud_msg = now - last_alert_time 
                 
-                # Alert sends to cloud once every 10 seconds, and when duration is past 3 seconds
-                if last_cloud_msg >= 10 and duration >= 3:
+                # Alert sends to cloud once every 10 seconds, and when duration is past 0.5 seconds
+                if last_cloud_msg >= 10 and duration >= 0.5:
                     last_alert_time = now
                     send_alert_msg(duration)
+                
+                # Speaker plays sound when duration past 0.5 seconds
+                if duration >= 0.5 and not alert_playing:
+                    alert_playing = True
+                    thread = threading.Thread(target=trigger_alert_sound)
+                    thread.daemon = True
+                    thread.start()
             else:
                 alert_start_time = None
 
