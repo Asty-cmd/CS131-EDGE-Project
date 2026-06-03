@@ -63,7 +63,7 @@ export default function HomePage() {
         {alerts.map((alert) => (
           <div key={alert.id} className="grid grid-cols-3 w-full gap-[4vw]">
             <p className="text-xl">
-              {alert.duration > 5.0 ? "❗ Critical Warning: " : "⚠️ Warning: "}
+              {alert.duration > 2.0 ? "❗ Critical Warning: " : "⚠️ Warning: "}
               {alert.message}
             </p>
             <p className="text-xl">Time: {alert.time}</p>
